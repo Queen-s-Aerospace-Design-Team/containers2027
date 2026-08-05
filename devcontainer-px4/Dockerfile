@@ -2,11 +2,11 @@
 # Base image & environment
 # --------------------------
 
-FROM osrf/ros:humble-desktop
-	
+FROM osrf/ros:jazzy-desktop
+
 LABEL org.opencontainers.image.source="https://github.com/Queen-s-Aerospace-Design-Team/containers"
 
-ENV ROS_DISTRO=humble \
+ENV ROS_DISTRO=jazzy \
 	DEBIAN_FRONTEND=noninteractive  \
 	HOME_DIR=/home/qadt-dev \
     USERNAME=qadt-dev
@@ -49,12 +49,12 @@ RUN apt-get update && apt-get install -y \
     neovim \
 	tmux \
     # Extra ros installs
-    '~nros-humble-rqt*' \
-	ros-humble-turtlesim \
-    ros-humble-navigation2 \
-    ros-humble-nav2-bringup \
-    ros-humble-ros-gz \
-    ros-humble-topic-tools \
+    '~nros-jazzy-rqt*' \
+	ros-jazzy-turtlesim \
+    ros-jazzy-navigation2 \
+    ros-jazzy-nav2-bringup \
+    ros-jazzy-ros-gz \
+    ros-jazzy-topic-tools \
     mesa-utils \
     libgl1 \
     libglx-mesa0 \
@@ -87,7 +87,7 @@ RUN git clone --single-branch --branch v1.16.1 https://github.com/PX4/PX4-Autopi
 	&& make -C PX4-Autopilot
 
 # Python dependencies for google drive uploading and Jetson GPIO
-RUN pip install --no-cache-dir \
+RUN pip install --no-cache-dir --break-system-packages \
     google-auth \
     google-auth-oauthlib \
     google-api-python-client \

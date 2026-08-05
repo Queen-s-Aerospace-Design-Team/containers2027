@@ -2,11 +2,11 @@
 # Base image & environment
 # --------------------------
     
-FROM ros:humble-ros-base
+FROM ros:jazzy-ros-base
 
 LABEL org.opencontainers.image.source="https://github.com/Queen-s-Aerospace-Design-Team/containers"
 
-ENV ROS_DISTRO=humble \
+ENV ROS_DISTRO=jazzy \
     DEBIAN_FRONTEND=noninteractive \
     HOME_DIR=/home/qadt-deploy \
     USERNAME=qadt-deploy
@@ -47,7 +47,7 @@ RUN git clone --branch v2.4.3 https://github.com/eProsima/Micro-XRCE-DDS-Agent.g
 	&& rm -rf Micro-XRCE-DDS-Agent
 
 # Python dependencies for google drive uploading and Jetson GPIO
-RUN pip install --no-cache-dir \
+RUN pip install --no-cache-dir --break-system-packages \
     google-auth \
     google-auth-oauthlib \
     google-api-python-client \
