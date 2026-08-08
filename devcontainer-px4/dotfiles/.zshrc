@@ -110,17 +110,15 @@ zstyle ':omz:update' mode disabled
 # ----- ADDED AS PART OF QADT DEV ENVIRONMENT -----
 
 # ROS environment, colcon_cd and argcomplete, and colcon argcomplete setup.
-# NOTE: This will only work with bash shells. If you are using ZSH shell, 
-# replace the '.bash' with '.zsh'.
-source /opt/ros/humble/setup.zsh
+source /opt/ros/jazzy/setup.zsh
 source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.zsh
 source /usr/share/colcon_cd/function/colcon_cd-argcomplete.zsh
 source /usr/share/colcon_cd/function/colcon_cd.sh
 export _colcon_cd_root=$HOME
 
 # argcomplete for ros2 & colcon. THESE ARE VERY NICE TO HAVE :D
-eval "$(register-python-argcomplete3 ros2)"
-eval "$(register-python-argcomplete3 colcon)"
+eval "$(register-python-argcomplete ros2)"
+eval "$(register-python-argcomplete colcon)"
 
 # ----- END ----- (keep some empty lines at the end of this file)
 

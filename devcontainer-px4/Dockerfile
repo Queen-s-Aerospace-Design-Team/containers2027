@@ -8,8 +8,8 @@ LABEL org.opencontainers.image.source="https://github.com/Queen-s-Aerospace-Desi
 
 ENV ROS_DISTRO=jazzy \
 	DEBIAN_FRONTEND=noninteractive  \
-	HOME_DIR=/home/qadt-dev \
-    USERNAME=qadt-dev
+	HOME_DIR=/home/qadt \
+    USERNAME=qadt
 
 SHELL ["/bin/bash", "-c"] 
 
@@ -48,6 +48,7 @@ RUN apt-get update && apt-get install -y \
 	vim \
     neovim \
 	tmux \
+    fuse \
     # Extra ros installs
     '~nros-jazzy-rqt*' \
 	ros-jazzy-turtlesim \
@@ -93,6 +94,13 @@ RUN pip install --no-cache-dir --break-system-packages \
     google-api-python-client \
     Jetson.GPIO
 
+# register-python-argcomplete3 (used by dotfiles/.bashrc and .zshrc for ros2/colcon tab
+# completion) isn't pulled in by osrf/ros:jazzy-desktop the way it was on the old Humble
+# base. Kept as its own late layer so it doesn't invalidate the PX4-Autopilot build cache
+# above when it needs to change.
+RUN apt-get update && apt-get install -y python3-argcomplete \
+    && rm -rf /var/lib/apt/lists/*
+
 # --------------------------
 # Entrypoint and User
 # --------------------------
@@ -105,10 +113,13 @@ COPY dotfiles/.bashrc \
 	entrypoint.sh \
 	./
 
-# Add new user with sudo access without needing password
+# Add new user with sudo access without needing password.
+# Also in 'dialout' so QGroundControl/serial tools work against a real Pixhawk over USB
+# without the "current user does not have the correct permissions to access serial
+# devices" warning.
 RUN useradd -ms /bin/bash ${USERNAME} && \
     echo "${USERNAME}:aero" | chpasswd && \
-    usermod -aG sudo ${USERNAME} \
+    usermod -aG sudo,dialout ${USERNAME} \
 	&& echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} \
     && chmod 0440 /etc/sudoers.d/${USERNAME}
 
@@ -118,5 +129,5 @@ RUN chown -R ${USERNAME}:${USERNAME} ${HOME_DIR} \
 
 # Finalize
 USER ${USERNAME}
-ENTRYPOINT [ "/home/qadt-dev/entrypoint.sh" ]
+ENTRYPOINT [ "/home/qadt/entrypoint.sh" ]
 CMD [ "bash" ]
