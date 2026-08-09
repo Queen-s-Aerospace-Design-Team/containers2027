@@ -115,6 +115,15 @@ COPY dotfiles/.bashrc \
 	entrypoint.sh \
 	./
 
+# osrf/ros:jazzy-desktop (Ubuntu 24.04) ships a built-in 'ubuntu' user pinned to UID 1000.
+# UID 1000 is the most common primary-user UID on a fresh Linux install, so leaving that
+# account in place means the devcontainer feature that remaps ${USERNAME}'s UID to match
+# whichever host UID is connecting (VS Code's common-utils updateRemoteUserUID) can't use
+# 1000 - it falls back to 1001, permanently mismatching anyone whose host UID actually is
+# 1000 against the bind-mounted workspace they own, breaking writes (e.g. colcon's log/).
+# Removing it frees 1000 up for ${USERNAME} to actually get remapped to it.
+RUN deluser --remove-home ubuntu 2>/dev/null || true
+
 # Add new user with sudo access without needing password.
 # Also in 'dialout' so QGroundControl/serial tools work against a real Pixhawk over USB
 # without the "current user does not have the correct permissions to access serial
