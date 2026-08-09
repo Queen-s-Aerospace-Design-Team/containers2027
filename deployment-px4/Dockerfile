@@ -4,8 +4,6 @@
     
 FROM ros:jazzy-ros-base
 
-LABEL org.opencontainers.image.source="https://github.com/Queen-s-Aerospace-Design-Team/containers2027"
-
 ENV ROS_DISTRO=jazzy \
     DEBIAN_FRONTEND=noninteractive \
     HOME_DIR=/home/qadt-deploy \
@@ -56,15 +54,15 @@ RUN pip install --no-cache-dir --break-system-packages \
 # -- Repo Clone & Build --
 
 # Clone repo and run rosdep install
-RUN git clone --branch main --depth 1 --recurse-submodules https://github.com/Queen-s-Aerospace-Design-Team/AEAC2026.git \
+RUN git clone --branch main --depth 1 --recurse-submodules https://github.com/Queen-s-Aerospace-Design-Team/AeroSAE2027.git \
     && apt-get update \
-    && cd ${HOME_DIR}/AEAC2026/ros_ws \
+    && cd ${HOME_DIR}/AeroSAE2027/ros_ws \
     && source /opt/ros/${ROS_DISTRO}/setup.bash \
     && rosdep install --from-paths src --ignore-src -y --rosdistro=${ROS_DISTRO} \
     && rm -rf /var/lib/apt/lists/*
 
 # Run colcon build
-RUN cd ${HOME_DIR}/AEAC2026/ros_ws \
+RUN cd ${HOME_DIR}/AeroSAE2027/ros_ws \
     && source /opt/ros/${ROS_DISTRO}/setup.bash \
     && colcon build --symlink-install --base-paths src
 
@@ -75,6 +73,10 @@ COPY dotfiles/.bashrc \
 	dotfiles/.zshrc \
 	entrypoint.sh \
 	./
+
+# Kept late (not up by FROM) so editing it doesn't invalidate the expensive
+# repo-clone/colcon-build cache above.
+LABEL org.opencontainers.image.source="https://github.com/Queen-s-Aerospace-Design-Team/containers2027"
 
 # Add new user with sudo access without needing password
 RUN useradd -ms /bin/bash ${USERNAME} && \

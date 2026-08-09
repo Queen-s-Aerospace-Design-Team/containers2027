@@ -2,8 +2,8 @@
 
 set -euo pipefail
 
-WORKSPACE="${HOME}/AEAC2026/ros_ws"
-REPO_ROOT="${HOME}/AEAC2026"
+WORKSPACE="${HOME}/AeroSAE2027/ros_ws"
+REPO_ROOT="${HOME}/AeroSAE2027"
 
 hasRepoConnection() {
     GIT_TERMINAL_PROMPT=0 timeout 5 git -C "${REPO_ROOT}" ls-remote --exit-code origin >/dev/null 2>&1

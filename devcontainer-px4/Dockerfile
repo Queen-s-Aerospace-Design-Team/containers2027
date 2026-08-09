@@ -4,8 +4,6 @@
 
 FROM osrf/ros:jazzy-desktop
 
-LABEL org.opencontainers.image.source="https://github.com/Queen-s-Aerospace-Design-Team/containers2027"
-
 ENV ROS_DISTRO=jazzy \
 	DEBIAN_FRONTEND=noninteractive  \
 	HOME_DIR=/home/qadt \
@@ -100,6 +98,10 @@ RUN pip install --no-cache-dir --break-system-packages \
 # above when it needs to change.
 RUN apt-get update && apt-get install -y python3-argcomplete \
     && rm -rf /var/lib/apt/lists/*
+
+# Kept late (not up by FROM) so editing it doesn't invalidate the expensive
+# PX4-Autopilot build cache above.
+LABEL org.opencontainers.image.source="https://github.com/Queen-s-Aerospace-Design-Team/containers2027"
 
 # --------------------------
 # Entrypoint and User
