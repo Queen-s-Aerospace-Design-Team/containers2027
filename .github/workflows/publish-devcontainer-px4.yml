@@ -1,0 +1,45 @@
+name: Publish devcontainer-px4
+
+# Runs build.sh's own "push" path - not a separate build pipeline - so CI and a human
+# running it locally always do exactly the same thing.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "devcontainer-px4/**"
+      - ".github/workflows/publish-devcontainer-px4.yml"
+  workflow_dispatch: {} # manual trigger, for testing this workflow itself
+
+permissions:
+  contents: read
+  packages: write # needed to push to GHCR with the built-in GITHUB_TOKEN
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # GitHub's hosted runners ship with ~14GB free by default - not enough for a
+      # ~15GB image plus PX4-Autopilot's build artifacts. This reclaims space wasted
+      # on preinstalled toolchains (Android SDK, .NET, GHC, etc.) we never use here.
+      - name: Free up runner disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          docker-images: false # nothing pulled yet at this point
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # build.sh resolves the registry login username from `git config user.name` -
+      # give it something sensible to find in this throwaway CI checkout.
+      - name: Configure git identity for build.sh's login step
+        run: git config --global user.name "${{ github.actor }}"
+
+      - name: Build and push
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./build.sh devcontainer-px4 push

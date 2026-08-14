@@ -29,7 +29,9 @@ general() {
     ACTION=${2:-local} # Action defaults to local builds
 
     if [[ $ACTION == "push" ]]; then
-        source .env # Expects GH Token
+        # Expects GHCR_TOKEN. Locally that comes from .env (gitignored); in CI it's
+        # already set as a real environment variable, so .env won't exist - don't fail.
+        [[ -f .env ]] && source .env
     fi
 
     [[ -z "${FOLDER:-}" ]] && { echo "Usage: $0 <folder-with-Dockerfile> [push|local]"; exit 1; }
