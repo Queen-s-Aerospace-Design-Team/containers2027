@@ -11,7 +11,8 @@ matplotlib>=3.0
 numpy>=1.13
 nunavut>=1.1.0
 packaging
-pandas>=0.21
+# <3: pandas 3 needs numpy 2; ROS 2 Jazzy uses apt's numpy 1.26, which pip can't replace.
+pandas>=0.21,<3
 pkgconfig
 psutil
 pygments
