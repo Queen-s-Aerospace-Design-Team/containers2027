@@ -2,7 +2,12 @@
 # Base image & environment
 # --------------------------
 
-FROM osrf/ros:jazzy-desktop
+# Not osrf/ros:jazzy-desktop: it's amd64-only, so the "arm64" build silently got
+# x86 binaries and Gazebo hung under Rosetta on Apple Silicon. Same contents.
+FROM ros:jazzy-ros-base
+
+RUN apt-get update && apt-get install -y ros-jazzy-desktop \
+    && rm -rf /var/lib/apt/lists/*
 
 ENV ROS_DISTRO=jazzy \
 	DEBIAN_FRONTEND=noninteractive  \
@@ -93,7 +98,7 @@ RUN pip install --no-cache-dir --break-system-packages \
     Jetson.GPIO
 
 # register-python-argcomplete3 (used by dotfiles/.bashrc and .zshrc for ros2/colcon tab
-# completion) isn't pulled in by osrf/ros:jazzy-desktop the way it was on the old Humble
+# completion) isn't pulled in by the Jazzy desktop base the way it was on the old Humble
 # base. Kept as its own late layer so it doesn't invalidate the PX4-Autopilot build cache
 # above when it needs to change.
 RUN apt-get update && apt-get install -y python3-argcomplete \
@@ -115,7 +120,7 @@ COPY dotfiles/.bashrc \
 	entrypoint.sh \
 	./
 
-# osrf/ros:jazzy-desktop (Ubuntu 24.04) ships a built-in 'ubuntu' user pinned to UID 1000.
+# The Ubuntu 24.04 base (ros:jazzy-ros-base) ships a built-in 'ubuntu' user pinned to UID 1000.
 # UID 1000 is the most common primary-user UID on a fresh Linux install, so leaving that
 # account in place means the devcontainer feature that remaps ${USERNAME}'s UID to match
 # whichever host UID is connecting (VS Code's common-utils updateRemoteUserUID) can't use
